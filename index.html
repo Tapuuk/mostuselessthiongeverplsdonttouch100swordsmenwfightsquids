@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gamesite — Flash Games</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Ruffle (the .swf player) is loaded lazily in app.js the first time a game
+       is opened, so just browsing the catalog never downloads the WASM bundle. -->
+</head>
+<body>
+  <!-- Math cover: shown on every load/reload. "Back" reveals the games site. -->
+  <div id="math-cover">
+    <div class="m-banner">
+      <h1>Everyday Math</h1>
+      <p>Grade 9 &middot; Daily Practice</p>
+    </div>
+    <div class="m-main">
+      <ol id="math-questions"></ol>
+      <div class="m-actions">
+        <button id="math-check" type="button">Check answers</button>
+        <span id="math-score"></span>
+      </div>
+    </div>
+    <a id="math-back" href="#" title="Back">Back</a>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      Gamesite
+    </div>
+
+    <form id="search-form" class="search">
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Search Flash games on the Internet Archive…"
+        autocomplete="off"
+        aria-label="Search Flash games"
+      />
+      <button type="submit" aria-label="Search">Search</button>
+    </form>
+
+    <div class="topbar-actions">
+      <button id="to-math-btn" class="ghost-btn" title="Back to math (Ctrl+L)">↩ Math</button>
+      <button id="export-btn" class="ghost-btn" title="Download a backup of your favorites, history and game saves">Export saves</button>
+      <button id="import-btn" class="ghost-btn" title="Restore from a backup file">Import saves</button>
+      <input id="import-file" type="file" accept="application/json" hidden />
+    </div>
+  </header>
+
+  <main>
+    <!-- Favorites row -->
+    <section id="favorites-section" class="shelf" hidden>
+      <h2>★ Favorites</h2>
+      <div id="favorites-grid" class="grid"></div>
+    </section>
+
+    <!-- Recently played row -->
+    <section id="history-section" class="shelf" hidden>
+      <h2>↺ Recently played</h2>
+      <div id="history-grid" class="grid"></div>
+    </section>
+
+    <!-- Search results -->
+    <section id="results-section" class="shelf">
+      <h2 id="results-title">Browse games</h2>
+      <div id="results-grid" class="grid"></div>
+      <div id="results-status" class="status"></div>
+      <button id="load-more" class="load-more" hidden>Load more</button>
+    </section>
+  </main>
+
+  <!-- Player overlay -->
+  <div id="player-overlay" class="overlay" hidden>
+    <div class="player-shell">
+      <div class="player-head">
+        <span id="player-title">Loading…</span>
+        <div class="player-head-actions">
+          <button id="player-fullscreen" class="ghost-btn" title="Fullscreen (F)">⛶ Fullscreen</button>
+          <button id="player-fav" class="ghost-btn" title="Add to favorites">♡ Favorite</button>
+          <button id="player-close" class="ghost-btn" title="Close (Esc)">✕ Close</button>
+        </div>
+      </div>
+      <div id="player-stage" class="player-stage">
+        <div id="player-status" class="status">Loading game…</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
