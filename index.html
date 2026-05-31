@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gamesite — Flash Games</title>
+  <title>Daily Math - Grade 9</title>
+  <meta name="description" content="Daily Math - Grade 9: free daily math practice for Grade 9 students. Solve 5 new algebra, geometry, and number questions every day and check your answers." />
+  <meta name="keywords" content="grade 9 math, daily math practice, algebra, geometry, math worksheets, math questions, ninth grade math" />
+  <meta name="author" content="Daily Math" />
+  <meta name="theme-color" content="#2f6fb0" />
+  <meta property="og:title" content="Daily Math - Grade 9" />
+  <meta property="og:description" content="Free daily Grade 9 math practice. 5 new questions every day." />
+  <meta property="og:type" content="website" />
+  <!-- Math-themed favicon (inline SVG): a blue tile with a Pi symbol, so history/bookmarks read as a math site. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%232f6fb0'/%3E%3Ctext x='32' y='46' font-size='40' font-family='Georgia,serif' fill='white' text-anchor='middle'%3E%CF%80%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="styles.css" />
   <!-- Ruffle (the .swf player) is loaded lazily in app.js the first time a game
        is opened, so just browsing the catalog never downloads the WASM bundle. -->
@@ -12,7 +21,7 @@
   <!-- Math cover: shown on every load/reload. "Back" reveals the games site. -->
   <div id="math-cover">
     <div class="m-banner">
-      <h1>Everyday Math</h1>
+      <h1>Daily Math</h1>
       <p>Grade 9 &middot; Daily Practice</p>
     </div>
     <div class="m-main">
@@ -21,6 +30,7 @@
         <button id="math-check" type="button">Check answers</button>
         <span id="math-score"></span>
       </div>
+      <p class="m-foot">New questions every day &middot; &copy; 2026 Daily Math &middot; Grade 9 Practice</p>
     </div>
     <a id="math-back" href="#" title="Back">Back</a>
   </div>

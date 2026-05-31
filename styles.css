@@ -302,6 +302,14 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
 #math-check:hover { background: #2a6299; }
 #math-score { font-weight: bold; font-size: 1.05rem; }
 
+.m-foot {
+  margin-top: 40px;
+  text-align: center;
+  color: #99a0ad;
+  font-size: 0.85rem;
+  font-family: system-ui, sans-serif;
+}
+
 /* deliberately small & low-key */
 #math-back {
   position: fixed;
