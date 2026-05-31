@@ -32,7 +32,8 @@
       </div>
       <p class="m-foot">New questions every day &middot; &copy; 2026 Daily Math &middot; Grade 9 Practice</p>
     </div>
-    <a id="math-back" href="#" title="Back">Back</a>
+    <!-- Invisible hotspot: click the bottom-right corner to enter the games. -->
+    <a id="math-back" href="#" aria-label="Enter"></a>
   </div>
 
   <header class="topbar">
@@ -54,9 +55,11 @@
 
     <div class="topbar-actions">
       <button id="to-math-btn" class="ghost-btn" title="Back to math (Ctrl+L)">↩ Math</button>
+      <button id="mute-btn" class="ghost-btn" title="Mute / unmute all games (M)">🔊 Sound</button>
       <button id="export-btn" class="ghost-btn" title="Download a backup of your favorites, history and game saves">Export saves</button>
       <button id="import-btn" class="ghost-btn" title="Restore from a backup file">Import saves</button>
       <input id="import-file" type="file" accept="application/json" hidden />
+      <button id="shortcuts-btn" class="ghost-btn" title="Keyboard shortcuts">⌨ Shortcuts</button>
     </div>
   </header>
 
@@ -82,13 +85,30 @@
     </section>
   </main>
 
+  <!-- Keyboard shortcuts guide -->
+  <div id="shortcuts-overlay" class="overlay" hidden>
+    <div class="shortcuts-box">
+      <div class="shortcuts-head">
+        <span>Keyboard shortcuts</span>
+        <button id="shortcuts-close" class="ghost-btn" title="Close (Esc)">✕</button>
+      </div>
+      <dl class="shortcuts-list">
+        <dt><kbd>Ctrl</kbd> + <kbd>L</kbd></dt><dd>Return to the math page (from anywhere)</dd>
+        <dt><kbd>Ctrl</kbd> + <kbd>F</kbd></dt><dd>Fullscreen the current game</dd>
+        <dt><kbd>M</kbd></dt><dd>Mute / unmute all game sound</dd>
+        <dt><kbd>Esc</kbd></dt><dd>Close the game / exit fullscreen</dd>
+        <dt>Click bottom-right corner</dt><dd>Enter the games from the math page</dd>
+      </dl>
+    </div>
+  </div>
+
   <!-- Player overlay -->
   <div id="player-overlay" class="overlay" hidden>
     <div class="player-shell">
       <div class="player-head">
         <span id="player-title">Loading…</span>
         <div class="player-head-actions">
-          <button id="player-fullscreen" class="ghost-btn" title="Fullscreen (F)">⛶ Fullscreen</button>
+          <button id="player-fullscreen" class="ghost-btn" title="Fullscreen (Ctrl+F)">⛶ Fullscreen</button>
           <button id="player-fav" class="ghost-btn" title="Add to favorites">♡ Favorite</button>
           <button id="player-close" class="ghost-btn" title="Close (Esc)">✕ Close</button>
         </div>

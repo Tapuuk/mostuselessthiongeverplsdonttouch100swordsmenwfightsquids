@@ -99,6 +99,7 @@ html, body {
   cursor: pointer;
 }
 .ghost-btn:hover { border-color: var(--accent); color: #fff; }
+.ghost-btn.active { border-color: var(--accent); color: #fff; background: var(--surface-2); }
 
 /* ---- Layout ---- */
 main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
@@ -235,6 +236,42 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   .topbar { gap: 10px; }
 }
 
+/* ============ Shortcuts guide ============ */
+.shortcuts-box {
+  width: min(440px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.shortcuts-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+.shortcuts-list {
+  margin: 0;
+  padding: 8px 18px 18px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 18px;
+  align-items: center;
+}
+.shortcuts-list dt { white-space: nowrap; }
+.shortcuts-list dd { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.shortcuts-list kbd {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+}
+
 /* ============ Math cover (front page) ============ */
 #math-cover {
   position: fixed;
@@ -310,14 +347,14 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   font-family: system-ui, sans-serif;
 }
 
-/* deliberately small & low-key */
+/* Invisible click target in the bottom-right corner — aim there to enter games.
+   No text, no cursor change, so it's not visible; you just know where it is. */
 #math-back {
   position: fixed;
-  right: 14px;
-  bottom: 12px;
-  font-family: system-ui, sans-serif;
-  font-size: 0.8rem;
-  color: #9aa0ad;
-  text-decoration: none;
+  right: 0;
+  bottom: 0;
+  width: 72px;
+  height: 72px;
+  background: transparent;
+  cursor: default;
 }
-#math-back:hover { color: #5b6270; text-decoration: underline; }

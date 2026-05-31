@@ -176,9 +176,26 @@ const playerStatus = el("player-status");
 const playerTitle = el("player-title");
 const playerFavBtn = el("player-fav");
 const playerFullscreenBtn = el("player-fullscreen");
+const muteBtn = el("mute-btn");
 let currentGame = null;
 let rufflePlayer = null;
 let rufflePromise = null;
+
+// Mute applies to every game (Ruffle is the only audio source). Persisted so
+// it stays muted across games, refreshes, and sessions.
+let isMuted = localStorage.getItem("gamesite.muted") === "1";
+
+function applyMute() {
+  if (rufflePlayer) rufflePlayer.volume = isMuted ? 0 : 1;
+  muteBtn.textContent = isMuted ? "🔇 Muted" : "🔊 Sound";
+  muteBtn.classList.toggle("active", isMuted);
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  localStorage.setItem("gamesite.muted", isMuted ? "1" : "0");
+  applyMute();
+}
 
 // Load the Ruffle bundle once, on first use, instead of on every page load.
 function ensureRuffle() {
@@ -232,7 +249,8 @@ async function openPlayer(game) {
     rufflePlayer = ruffle.createPlayer();
     playerStage.appendChild(rufflePlayer);
     // Same URL every time => Ruffle reuses the same saved SharedObject (progress).
-    await rufflePlayer.load({ url: swfUrl, autoplay: "on", letterbox: "on" });
+    await rufflePlayer.load({ url: swfUrl, autoplay: "on", letterbox: "on", volume: isMuted ? 0 : 1 });
+    applyMute();
     playerStatus.style.display = "none";
   } catch (err) {
     playerStatus.style.display = "";
@@ -421,11 +439,22 @@ function init() {
   });
   el("to-math-btn").addEventListener("click", showMath);
 
-  // Ctrl+L (or Cmd+L) jumps straight back to math from anywhere.
+  // Global shortcuts (work anywhere on the site).
   document.addEventListener("keydown", (e) => {
+    // Ctrl+L (or Cmd+L) jumps straight back to math.
     if ((e.ctrlKey || e.metaKey) && (e.key === "l" || e.key === "L")) {
       e.preventDefault();
       showMath();
+      return;
+    }
+    // M toggles mute — but not while typing in a field.
+    const typing = /^(INPUT|TEXTAREA)$/.test(e.target.tagName);
+    if (!typing && !e.ctrlKey && !e.metaKey && !e.altKey && (e.key === "m" || e.key === "M")) {
+      toggleMute();
+    }
+    // Esc closes the shortcuts popup.
+    if (e.key === "Escape" && !el("shortcuts-overlay").hidden) {
+      el("shortcuts-overlay").hidden = true;
     }
   });
 
@@ -444,10 +473,23 @@ function init() {
   document.addEventListener("keydown", (e) => {
     if (overlay.hidden) return;
     if (e.key === "Escape" && !document.fullscreenElement) closePlayer();
-    if (e.key === "f" || e.key === "F") toggleFullscreen();
+    if ((e.ctrlKey || e.metaKey) && (e.key === "f" || e.key === "F")) {
+      e.preventDefault(); // override the browser's Find while a game is open
+      toggleFullscreen();
+    }
   });
 
   playerFullscreenBtn.addEventListener("click", toggleFullscreen);
+  muteBtn.addEventListener("click", toggleMute);
+  applyMute(); // set the button's initial label from the saved state
+
+  // Shortcuts guide popup
+  const shortcutsOverlay = el("shortcuts-overlay");
+  el("shortcuts-btn").addEventListener("click", () => { shortcutsOverlay.hidden = false; });
+  el("shortcuts-close").addEventListener("click", () => { shortcutsOverlay.hidden = true; });
+  shortcutsOverlay.addEventListener("click", (e) => {
+    if (e.target === shortcutsOverlay) shortcutsOverlay.hidden = true;
+  });
   playerFavBtn.addEventListener("click", () => {
     if (currentGame) { toggleFavorite(currentGame); updatePlayerFavBtn(); }
   });
