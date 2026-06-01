@@ -329,10 +329,49 @@ function importSaves(file) {
 
 /* =========================================================================
  * Math cover page — shown on every load/reload until "Back" is clicked.
- * Randomized Grade 9 questions with a Check button.
+ * Wordle-style daily questions: the set is derived from the calendar day, so
+ * everyone visiting on the same (UTC) day gets the exact same 5 questions, and
+ * a brand-new set appears at 00:00 UTC. No backend needed — the date is the seed.
  * ========================================================================= */
-const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+// Day index since 2026-01-01 (UTC). It's the same value worldwide at any given
+// instant, so it makes a perfect shared seed and rolls over exactly at UTC midnight.
+function daySeed() {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const now = new Date();
+  const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.floor((todayUTC - Date.UTC(2026, 0, 1)) / DAY_MS);
+}
+
+// mulberry32: a tiny deterministic PRNG. The same seed always yields the same
+// stream of numbers, so a given day's questions are fully reproducible.
+function makeRng(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// The active PRNG used by the generators. Reseeded from the day in buildMathCover,
+// so every rand()/pick() below is deterministic for a given date.
+let rng = Math.random;
+const rand = (min, max) => Math.floor(rng() * (max - min + 1)) + min;
 const pick = arr => arr[rand(0, arr.length - 1)];
+
+// Engine-independent Fisher–Yates shuffle. (A `.sort()` comparator that calls
+// rng() would consume the stream differently across browsers and break the
+// "same set for everyone" guarantee, so we shuffle explicitly.)
+function shuffleSeeded(arr) {
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
 
 // Each generator returns { q: "question text", a: numericAnswer }.
 const MATH_GENERATORS = [
@@ -383,8 +422,21 @@ function buildMathCover() {
   list.innerHTML = "";
   mathAnswers = [];
 
-  // pick 5 distinct generators
-  const gens = [...MATH_GENERATORS].sort(() => Math.random() - 0.5).slice(0, 5);
+  // Seed today's PRNG — everything generated below is now deterministic for the day.
+  const seed = daySeed();
+  rng = makeRng(seed);
+
+  // Stamp the cover with the date + puzzle number so it reads as a daily puzzle.
+  const dateEl = el("math-date");
+  if (dateEl) {
+    const label = new Date().toLocaleDateString("en-US", {
+      weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
+    });
+    dateEl.textContent = `${label} · No. ${seed + 1}`;
+  }
+
+  // Pick today's 5 distinct generators (deterministic order from the daily seed).
+  const gens = shuffleSeeded(MATH_GENERATORS).slice(0, 5);
   gens.forEach((gen, i) => {
     const { q, a } = gen();
     mathAnswers.push(a);
@@ -407,7 +459,7 @@ function buildMathCover() {
 }
 
 // Return to the math cover instantly: stop any running game, leave fullscreen,
-// regenerate fresh questions, and show the cover at the top.
+// rebuild today's questions (same set all day), and show the cover at the top.
 function showMath() {
   if (document.fullscreenElement) document.exitFullscreen();
   if (!overlay.hidden) closePlayer();
@@ -417,6 +469,14 @@ function showMath() {
 }
 
 function checkMath() {
+  // Secret entry: answering question 4 with "61" opens the games on Check,
+  // regardless of what that question actually is or whether 61 is correct.
+  const q4 = el("math-questions").querySelector('input[data-idx="3"]');
+  if (q4 && q4.value.trim() === "61") {
+    el("math-cover").hidden = true;
+    return;
+  }
+
   let correct = 0;
   el("math-questions").querySelectorAll("input").forEach(input => {
     const row = input.closest(".m-q");
@@ -433,10 +493,6 @@ function checkMath() {
 function init() {
   buildMathCover();
   el("math-check").addEventListener("click", checkMath);
-  el("math-back").addEventListener("click", (e) => {
-    e.preventDefault();
-    el("math-cover").hidden = true;
-  });
   el("to-math-btn").addEventListener("click", showMath);
 
   // Global shortcuts (work anywhere on the site).

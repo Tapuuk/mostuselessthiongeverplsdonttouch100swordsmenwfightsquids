@@ -295,6 +295,7 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   letter-spacing: 0.5px;
 }
 .m-banner p { margin: 8px 0 0; opacity: 0.9; font-size: 1.05rem; }
+.m-date { font-size: 0.95rem !important; opacity: 0.75 !important; letter-spacing: 0.3px; }
 
 .m-main { max-width: 680px; margin: 0 auto; padding: 30px 22px 90px; }
 #math-questions { margin: 0; padding-left: 24px; }
@@ -345,16 +346,4 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   color: #99a0ad;
   font-size: 0.85rem;
   font-family: system-ui, sans-serif;
-}
-
-/* Invisible click target in the bottom-right corner — aim there to enter games.
-   No text, no cursor change, so it's not visible; you just know where it is. */
-#math-back {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  width: 72px;
-  height: 72px;
-  background: transparent;
-  cursor: default;
 }
