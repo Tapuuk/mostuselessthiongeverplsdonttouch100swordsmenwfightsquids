@@ -18,22 +18,32 @@
        is opened, so just browsing the catalog never downloads the WASM bundle. -->
 </head>
 <body>
-  <!-- Math cover: shown on every load/reload. "Back" reveals the games site. -->
+  <!-- Math cover: shown on every load/reload. Dr Frost-style (dark + yellow). -->
   <div id="math-cover">
-    <div class="m-banner">
-      <h1>Daily Math</h1>
-      <p>Grade 9 &middot; Daily Practice</p>
-      <!-- Today's date + puzzle number; same set for everyone, new set each day. -->
-      <p id="math-date" class="m-date"></p>
-    </div>
-    <div class="m-main">
+    <header class="m-nav">
+      <div class="m-logo">
+        <span class="m-logo-mark">&pi;</span>
+        <span class="m-logo-text">Daily Math</span>
+      </div>
+      <span class="m-nav-tag">Grade 9 &middot; Daily Practice</span>
+    </header>
+
+    <main class="m-main">
+      <div class="m-head">
+        <h1>Today's Practice</h1>
+        <!-- Today's date + puzzle number; same set for everyone, new set each day. -->
+        <p id="math-date" class="m-date"></p>
+      </div>
+
       <ol id="math-questions"></ol>
+
       <div class="m-actions">
         <button id="math-check" type="button">Check answers</button>
         <span id="math-score"></span>
       </div>
+
       <p class="m-foot">New questions every day &middot; &copy; 2026 Daily Math &middot; Grade 9 Practice</p>
-    </div>
+    </main>
   </div>
 
   <header class="topbar">

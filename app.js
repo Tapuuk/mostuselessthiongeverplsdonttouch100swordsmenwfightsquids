@@ -493,6 +493,10 @@ function checkMath() {
 function init() {
   buildMathCover();
   el("math-check").addEventListener("click", checkMath);
+  // Pressing Enter inside any answer box checks answers too.
+  el("math-questions").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); checkMath(); }
+  });
   el("to-math-btn").addEventListener("click", showMath);
 
   // Global shortcuts (work anywhere on the site).

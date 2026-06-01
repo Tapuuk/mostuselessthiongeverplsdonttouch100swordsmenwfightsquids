@@ -272,78 +272,131 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   font-size: 0.82rem;
 }
 
-/* ============ Math cover (front page) ============ */
+/* ============ Math cover (front page) — Dr Frost-style, dark + yellow ============ */
 #math-cover {
+  --df-yellow: #ffcc33;
+  --df-yellow-hi: #ffd84d;
+  --df-bg: #24262f;
+  --df-card: #31343f;
+  --df-line: #424653;
+  --df-ink: #eef0f5;
+  --df-muted: #a6acbb;
   position: fixed;
   inset: 0;
   z-index: 9999;
   overflow-y: auto;
-  background: #f6f7fb;
-  color: #1d2433;
-  font-family: Georgia, "Times New Roman", serif;
+  background: var(--df-bg);
+  color: var(--df-ink);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
 }
-.m-banner {
-  background: #2f6fb0;
-  color: #fff;
-  text-align: center;
-  padding: 30px 20px 26px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-.m-banner h1 {
-  margin: 0;
-  font-size: clamp(2rem, 6vw, 3rem);
-  letter-spacing: 0.5px;
-}
-.m-banner p { margin: 8px 0 0; opacity: 0.9; font-size: 1.05rem; }
-.m-date { font-size: 0.95rem !important; opacity: 0.75 !important; letter-spacing: 0.3px; }
 
-.m-main { max-width: 680px; margin: 0 auto; padding: 30px 22px 90px; }
-#math-questions { margin: 0; padding-left: 24px; }
-#math-questions li { margin-bottom: 14px; }
-
-.m-q {
-  background: #fff;
-  border: 1px solid #e3e6ef;
-  border-radius: 10px;
-  padding: 15px 18px;
+/* Top navigation bar */
+.m-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  padding: 13px 24px;
+  background: #2b2e38;
+  border-bottom: 1px solid #3a3e4b;
 }
-.m-q .q-text { font-size: 1.06rem; line-height: 1.4; }
+.m-logo { display: flex; align-items: center; gap: 11px; }
+.m-logo-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  background: var(--df-yellow);
+  color: #15161b;
+  border-radius: 9px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-family: Georgia, serif;
+}
+.m-logo-text { font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: 0.2px; }
+.m-nav-tag { color: var(--df-muted); font-size: 0.9rem; }
+
+/* Content */
+.m-main { max-width: 720px; margin: 0 auto; padding: 30px 22px 90px; }
+.m-head { margin-bottom: 22px; }
+.m-head h1 { margin: 0 0 5px; font-size: 1.6rem; font-weight: 800; color: #fff; }
+.m-date { margin: 0; color: var(--df-yellow); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.2px; }
+
+#math-questions { counter-reset: q; list-style: none; margin: 0; padding: 0; }
+#math-questions li { counter-increment: q; margin-bottom: 12px; }
+
+.m-q {
+  background: var(--df-card);
+  border: 1px solid var(--df-line);
+  border-radius: 12px;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+/* Yellow number badge (turns green/red with feedback) */
+.m-q::before {
+  content: counter(q);
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  background: var(--df-yellow);
+  color: #15161b;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+.m-q .q-text { flex: 1; font-size: 1.05rem; line-height: 1.45; color: var(--df-ink); }
 .m-q input {
-  width: 96px;
-  flex-shrink: 0;
-  padding: 9px 11px;
-  border: 1px solid #c7ccda;
+  width: 110px;
+  flex: 0 0 auto;
+  padding: 10px 12px;
+  background: #292b34;
+  border: 1.5px solid #4a4e5c;
   border-radius: 8px;
+  color: #fff;
   font-size: 1rem;
   font-family: inherit;
   text-align: center;
 }
-.m-q input:focus { outline: none; border-color: #2f6fb0; }
-.m-q.correct input { border-color: #3aa657; background: #eafaef; }
-.m-q.wrong input { border-color: #d9534f; background: #fdecec; }
+.m-q input::placeholder { color: #5a5f70; }
+.m-q input:focus {
+  outline: none;
+  border-color: var(--df-yellow);
+  box-shadow: 0 0 0 3px rgba(255, 204, 51, 0.22);
+}
+.m-q.correct { border-color: #2fbf6b; }
+.m-q.correct::before { background: #2fbf6b; color: #06270f; }
+.m-q.correct input { border-color: #2fbf6b; background: rgba(47, 191, 107, 0.12); color: #b8f0cf; }
+.m-q.wrong { border-color: #e0544e; }
+.m-q.wrong::before { background: #e0544e; color: #2a0807; }
+.m-q.wrong input { border-color: #e0544e; background: rgba(224, 84, 78, 0.12); color: #f3b6b3; }
 
-.m-actions { display: flex; align-items: center; gap: 18px; margin-top: 24px; }
+.m-actions { display: flex; align-items: center; gap: 18px; margin-top: 26px; }
 #math-check {
-  background: #2f6fb0;
-  color: #fff;
+  background: var(--df-yellow);
+  color: #15161b;
   border: none;
-  padding: 11px 24px;
+  padding: 12px 26px;
   border-radius: 8px;
   font-size: 1rem;
+  font-weight: 700;
   font-family: inherit;
   cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
 }
-#math-check:hover { background: #2a6299; }
-#math-score { font-weight: bold; font-size: 1.05rem; }
+#math-check:hover { background: var(--df-yellow-hi); }
+#math-check:active { transform: translateY(1px); }
+#math-score { font-weight: 700; font-size: 1.05rem; color: var(--df-yellow); }
 
 .m-foot {
   margin-top: 40px;
   text-align: center;
-  color: #99a0ad;
+  color: #6b7080;
   font-size: 0.85rem;
-  font-family: system-ui, sans-serif;
 }
