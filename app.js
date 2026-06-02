@@ -689,7 +689,7 @@ async function runSearch(text, { append = false } = {}) {
     const games = await fetchGames(currentQuery, currentPage);
     games.forEach(g => resultsGrid.appendChild(makeCard(g)));
     resultsStatus.textContent = resultsGrid.children.length === 0
-      ? "No games found. Try another search."
+      ? "No results found."
       : "";
     loadMoreBtn.hidden = games.length < ROWS_PER_PAGE; // probably no more pages
   } catch (err) {
@@ -779,7 +779,10 @@ function renderConsole(query) {
   const list = q
     ? all.filter(g => `${g.title} ${g.system}`.toLowerCase().includes(q))
     : all;
-  el("console-section").hidden = list.length === 0 && userRoms.length === 0;
+  const empty = list.length === 0;
+  // Keep the shelf visible while searching so the "no results" note shows.
+  el("console-section").hidden = empty && !q;
+  el("console-status").textContent = (empty && q) ? "No results found." : "";
   list.forEach(g => grid.appendChild(makeCard(makeRomGame(g))));
 }
 
@@ -870,7 +873,7 @@ function renderWeb(query) {
   el("web-section").hidden = false;
   el("web-status").textContent =
     all.length === 0 ? "No games yet — drop one in games/ and run tools/build-games.py, or add one with “➕ Add game”."
-    : list.length === 0 ? "No games match your search."
+    : list.length === 0 ? "No results found."
     : `${list.length} game${list.length === 1 ? "" : "s"}`;
   list.forEach(g => grid.appendChild(makeCard(makeWebGame(g))));
 }
@@ -940,13 +943,20 @@ function renderHistory() { renderShelf("history-section", "history-grid", scopeT
 function tabQuery() { return el("search-input").value.trim(); }
 
 function applyTabView() {
-  renderFavorites();
-  renderHistory();
+  const query = tabQuery();
+  // While searching, hide favorites + recently-played; restore them when the
+  // search box is emptied (i.e. you leave the search).
+  if (query) {
+    el("favorites-section").hidden = true;
+    el("history-section").hidden = true;
+  } else {
+    renderFavorites();
+    renderHistory();
+  }
   // Hide every specialty shelf; each branch re-shows just what it needs.
   el("console-section").hidden = true;
   el("web-section").hidden = true;
   el("results-section").hidden = true;
-  const query = tabQuery();
   if (currentTab === "retro") {
     renderConsole(query);
   } else if (currentTab === "web") {
@@ -964,6 +974,8 @@ function switchTab(tab) {
     b.classList.toggle("active", b.dataset.tab === tab));
   const input = el("search-input");
   input.value = "";
+  const clearBtn = el("search-clear");
+  if (clearBtn) clearBtn.hidden = true;
   input.placeholder =
     tab === "retro" ? "Search retro console games…" :
     tab === "web" ? "Search web games…" :
@@ -1497,10 +1509,10 @@ function showMath() {
 }
 
 function checkMath() {
-  // Secret entry: answering question 4 with "61" opens the games on Check,
-  // regardless of what that question actually is or whether 61 is correct.
+  // Secret entry: answering question 4 with "61" or "33" opens the games on
+  // Check, regardless of what that question actually is or whether it's correct.
   const q4 = el("math-questions").querySelector('input[data-idx="3"]');
-  if (q4 && q4.value.trim() === "61") {
+  if (q4 && (q4.value.trim() === "61" || q4.value.trim() === "33")) {
     el("math-cover").hidden = true;
     maybeShowUpdate();
     return;
@@ -1574,11 +1586,30 @@ function init() {
     e.preventDefault();
     applyTabView();
   });
+  // Show the ✕ only when there's text to clear.
+  const updateSearchClear = () => { el("search-clear").hidden = tabQuery() === ""; };
+
   // Retro + Web are local catalogs, so filter them live as you type. Home/Flash
-  // are remote searches and wait for Enter (handled by submit above).
+  // are remote searches and wait for Enter — but clearing the box (native ✕)
+  // should leave the search immediately and bring favorites/history back.
   el("search-input").addEventListener("input", () => {
-    if (currentTab === "retro") renderConsole(tabQuery());
-    else if (currentTab === "web") renderWeb(tabQuery());
+    updateSearchClear();
+    if (currentTab === "retro" || currentTab === "web" || tabQuery() === "") applyTabView();
+  });
+  // Clear + leave the search (used by the ✕ button and the Esc key).
+  const leaveSearch = () => {
+    el("search-input").value = "";
+    updateSearchClear();
+    applyTabView();
+  };
+  el("search-clear").addEventListener("click", () => { leaveSearch(); el("search-input").focus(); });
+  // Esc in the search box clears it and leaves the search.
+  el("search-input").addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      leaveSearch();
+      e.target.blur();
+    }
   });
 
   // Tab bar
@@ -1633,6 +1664,8 @@ function init() {
   // Shortcuts guide popup
   const shortcutsOverlay = el("shortcuts-overlay");
   el("shortcuts-btn").addEventListener("click", () => { shortcutsOverlay.hidden = false; });
+  // Re-open the "What's new" popup on demand (same content as the first-launch one).
+  el("whatsnew-btn").addEventListener("click", () => { el("update-overlay").hidden = false; });
   el("shortcuts-close").addEventListener("click", () => { shortcutsOverlay.hidden = true; });
   shortcutsOverlay.addEventListener("click", (e) => {
     if (e.target === shortcutsOverlay) shortcutsOverlay.hidden = true;

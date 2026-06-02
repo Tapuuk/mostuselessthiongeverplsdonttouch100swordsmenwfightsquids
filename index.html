@@ -59,6 +59,7 @@
       <button id="import-btn" class="ghost-btn" title="Restore from a backup file">Import saves</button>
       <input id="import-file" type="file" accept="application/json" hidden />
       <button id="shortcuts-btn" class="ghost-btn" title="Keyboard shortcuts">⌨ Shortcuts</button>
+      <button id="whatsnew-btn" class="ghost-btn" title="What's new">ℹ️ What's new</button>
     </div>
   </header>
 
@@ -73,8 +74,12 @@
   <!-- One search bar for the active tab: global on Home, scoped to the tab's
        catalog otherwise. Sits under the tabs, above favorites / recently-played. -->
   <form id="search-form" class="tab-search">
-    <input id="search-input" type="search" autocomplete="off"
-      placeholder="Search all games…" aria-label="Search games" />
+    <div class="search-field">
+      <input id="search-input" type="search" autocomplete="off"
+        placeholder="Search all games…" aria-label="Search games" />
+      <button type="button" id="search-clear" class="search-clear"
+        title="Clear search (Esc)" aria-label="Clear search" hidden>✕</button>
+    </div>
     <button type="submit">Search</button>
   </form>
 
@@ -101,6 +106,7 @@
         <button id="addroms-btn" class="ghost-btn" title="Add your own ROMs by URL">➕ Add ROMs</button>
       </div>
       <div id="console-grid" class="grid"></div>
+      <div id="console-status" class="status"></div>
     </section>
 
     <!-- Web games: open-source HTML5 games vendored into games/<slug>/ (web-games.json) -->
@@ -138,7 +144,7 @@
         <dt><kbd>Ctrl</kbd> + <kbd>U</kbd></dt><dd>Quick load (retro &amp; Flash games)</dd>
         <dt><kbd>Ctrl</kbd> + <kbd>M</kbd></dt><dd>Mute / unmute all game sound</dd>
         <dt><kbd>Esc</kbd></dt><dd>Close the game / exit fullscreen</dd>
-        <dt>Type <kbd>61</kbd> in question 4</dt><dd>Enter the games from the math page</dd>
+        <dt>Type <kbd>61</kbd> or <kbd>33</kbd> in question 4</dt><dd>Enter the games from the math page</dd>
       </dl>
     </div>
   </div>

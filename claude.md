@@ -1,23 +1,66 @@
-# Project: Gamesite
+# Project: Games (a.k.a. gamesite)
 
-## What we're building
-A Flash games website with:
-- Ruffle player (loads .swf games from Internet Archive URLs)
-- Archive.org search API (no key needed)
-- localStorage for favorites, history, game saves
-- Export/import saves as JSON (important for Chromebook)
+## What this is
+A static games site that boots behind a **decoy math page** ("Daily Math - Grade 9")
+so it reads as a school site in history/bookmarks. Typing `61` into question 4 (or
+the right shortcut) reveals the game library. Built to run on a **locked-down school
+Chromebook** where most game hosts are DNS-blocked and dropping files into Downloads
+is a giveaway — so everything is served **same-origin** and all state lives in
+**browser storage only** (never Downloads).
 
-## Stack
-- Pure HTML/CSS/JS, no framework
-- Ruffle via CDN (unpkg.com)
-- Hosted on GitHub Pages
+Live on GitHub Pages at a custom domain (see `CNAME`).
 
-## Dev setup
-- Linux PC (Arch) for development
-- Chromebook for testing
-- Live Server for local preview
+## Library — four tabs
+One search bar sits under the tabs (global on Home, scoped to the tab otherwise).
 
-## Design goals
-- Clean, modern UI
+- **Home** — popular Flash + mixed favorites/recently-played.
+- **Flash Archive** — `.swf` games from the Internet Archive `softwarelibrary_flash`
+  collection, played with **Ruffle** (WASM, lazy-loaded from unpkg). Browsed via the
+  Archive search API with `sort[]=random`; fetched through `/cors/` URLs.
+- **Retro Console** — NES, SNES, Sega Genesis, GBA, Game Boy, Game Gear via
+  **EmulatorJS** in a same-origin `emulator.html` iframe. Built-in library is
+  retrobrews homebrew (legal). *Master System was removed.*
+- **Web Games** — self-hosted HTML5 games served from this origin (Chromebook-proof):
+  a few built-from-scratch canvas games + license-verified open-source titles
+  (GPL/MIT, credited).
 
+## Drop-in folders (add your own content)
+- `games/<slug>/index.html` (+ assets, self-contained, no external CDNs) → HTML5 games.
+- `roms/` → emulator ROMs (console auto-detected by file extension).
+- Both fold into the catalog at build time, served same-origin so they work on the
+  blocked device. **Anything committed is published publicly via GitHub Pages — only
+  add content you're allowed to host** (your own / open-source / public-domain).
 
+## Build tools (`tools/`)
+- `build-games.py` — scans `games/` → `web-games.json` (reads per-game `meta.json`:
+  title/license/credit/colors; uses screenshot cover or generates an SVG).
+- `build-roms.py` — scans `roms/` → `roms.json` (extension → EmulatorJS core/system).
+- `build.py` — runs both.
+- `fetch-html5-games.py` — vendors **license-verified** open-source HTML5 games from
+  GitHub into `games/<slug>/` (manifest-gated; refuses anything not redistributable).
+
+Run a builder after changing the folders, then commit. Site loads
+`web-games.json` / `roms.json` at runtime (`loadWebGames` / `loadRomFiles` in `app.js`).
+
+## Saves & state (browser-only)
+- localStorage: favorites, history, Flash SharedObject backups, retro save-states.
+- Retro Save/Load uses EmulatorJS `gameManager.getState/loadState` → localStorage.
+  EmulatorJS toolbar download/upload buttons are disabled (`EJS_Buttons`) so nothing
+  writes to Downloads. Flash has no VM snapshot API → "Backup/Restore" of SharedObjects.
+- Export/Import all saves as a JSON file (portable across devices).
+
+## Shortcuts
+`Ctrl+L` panic → math page · `Ctrl+F` fullscreen · `Ctrl+Y`/`Ctrl+U` quick save/load ·
+`Ctrl+M` mute · `Esc` close. Type `61` in math question 4 to enter the games.
+
+## Stack & dev
+- Pure HTML/CSS/JS, no framework. `index.html` + `styles.css` + `app.js` + `emulator.html`.
+- Ruffle + EmulatorJS from CDNs (lazy). GitHub Pages hosting.
+- Dev on Arch Linux; test on the Chromebook; Live Server / `python3 -m http.server`
+  for local preview. Validate JS with `node --check app.js`.
+
+## Content policy (firm)
+Only **legal homebrew / open-source / public-domain**, or content the **user supplies
+themselves**. No sourcing, curating, or mass-mirroring of pirated commercial ROMs or
+copyrighted itch.io games — "personal use" framing doesn't apply once it's published
+to a public site, which is distribution.
