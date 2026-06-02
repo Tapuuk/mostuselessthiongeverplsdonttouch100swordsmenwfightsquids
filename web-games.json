@@ -1,0 +1,62 @@
+[
+ {
+  "identifier": "local-1keys",
+  "title": "1 Keys",
+  "url": "games/1keys/index.html",
+  "img": "games/1keys/cover.svg",
+  "license": "GPL-3.0",
+  "credit": "Frank Force (KilledByAPixel)",
+  "source": "https://github.com/KilledByAPixel/1Keys"
+ },
+ {
+  "identifier": "local-2048",
+  "title": "2048",
+  "url": "games/2048/index.html",
+  "img": "games/2048/cover.svg"
+ },
+ {
+  "identifier": "local-bounceback",
+  "title": "Bounce Back",
+  "url": "games/bounceback/index.html",
+  "img": "games/bounceback/screenshot.png",
+  "license": "GPL-2.0",
+  "credit": "Frank Force (KilledByAPixel)",
+  "source": "https://github.com/KilledByAPixel/BounceBack"
+ },
+ {
+  "identifier": "local-breakout",
+  "title": "Breakout",
+  "url": "games/breakout/index.html",
+  "img": "games/breakout/cover.svg"
+ },
+ {
+  "identifier": "local-huejumper",
+  "title": "Hue Jumper",
+  "url": "games/huejumper/index.html",
+  "img": "games/huejumper/cover.svg",
+  "license": "GPL-3.0",
+  "credit": "Frank Force (KilledByAPixel)",
+  "source": "https://github.com/KilledByAPixel/HueJumper2k"
+ },
+ {
+  "identifier": "local-snake",
+  "title": "Snake",
+  "url": "games/snake/index.html",
+  "img": "games/snake/cover.svg"
+ },
+ {
+  "identifier": "local-spacehuggers",
+  "title": "Space Huggers",
+  "url": "games/spacehuggers/index.html",
+  "img": "games/spacehuggers/screenshot.png",
+  "license": "GPL-3.0",
+  "credit": "Frank Force (KilledByAPixel)",
+  "source": "https://github.com/KilledByAPixel/SpaceHuggers"
+ },
+ {
+  "identifier": "local-tetris",
+  "title": "Tetris",
+  "url": "games/tetris/index.html",
+  "img": "games/tetris/cover.svg"
+ }
+]

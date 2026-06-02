@@ -87,7 +87,39 @@ html, body {
 }
 .search button:hover { filter: brightness(1.08); }
 
-.topbar-actions { display: flex; gap: 8px; }
+/* Active-tab search bar: sits under the tabs, above favorites / recently-played.
+   Aligned to the same content column as the tabs and main grid. */
+.tab-search {
+  display: flex;
+  gap: 8px;
+  max-width: 1500px;
+  margin: 14px auto 0;
+  padding: 0 20px;
+}
+.tab-search input {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+}
+.tab-search input:focus { border-color: var(--accent); }
+.tab-search button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #0e1116;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tab-search button:hover { filter: brightness(1.08); }
+
+.topbar-actions { display: flex; gap: 8px; margin-left: auto; }
 
 .ghost-btn {
   padding: 9px 13px;
@@ -101,6 +133,36 @@ html, body {
 .ghost-btn:hover { border-color: var(--accent); color: #fff; }
 .ghost-btn.active { border-color: var(--accent); color: #fff; background: var(--surface-2); }
 
+/* ---- Library tabs ---- */
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 12px 20px 0;
+  max-width: 1500px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active {
+  color: #fff;
+  background: var(--surface);
+  border-color: var(--border);
+  border-bottom: 1px solid var(--surface);
+  margin-bottom: -1px;            /* overlap the .tabs bottom border so the tab "opens" */
+}
+
 /* ---- Layout ---- */
 main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
 
@@ -111,6 +173,62 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   color: var(--muted);
   margin: 0 0 14px;
   letter-spacing: 0.3px;
+}
+.shelf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.shelf-head h2 { margin: 0; }
+
+/* ---- Add-ROMs importer ---- */
+.addroms-box {
+  width: min(620px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.addroms-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+}
+.addroms-body { padding: 16px 18px; }
+.addroms-hint { margin: 0 0 12px; color: var(--muted); font-size: 0.86rem; line-height: 1.5; }
+.addroms-hint code {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-size: 0.8rem;
+}
+#addroms-input {
+  width: 100%;
+  resize: vertical;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  outline: none;
+}
+#addroms-input:focus { border-color: var(--accent); }
+.addroms-count { margin-top: 10px; color: var(--muted); font-size: 0.86rem; min-height: 1.2em; }
+.addroms-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 18px 18px;
 }
 
 /* Responsive grid: scales with viewport width & aspect ratio automatically */
@@ -149,6 +267,17 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.card-credit {
+  padding: 0 12px 10px;
+  margin-top: -4px;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  color: #8a909d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .fav-toggle {
@@ -196,6 +325,7 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   padding: 20px;
 }
 .player-shell {
+  position: relative;
   width: min(900px, 100%);
   max-height: 92vh;
   display: flex;
@@ -230,6 +360,42 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
 }
 .player-stage ruffle-player,
 .player-stage > div[style] { width: 100%; height: 100%; }
+.player-stage .rom-frame { width: 100%; height: 100%; border: 0; display: block; }
+
+/* System-labelled tile for console cards (no Archive thumbnail) */
+.rom-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-size: 1.05rem;
+  color: #fff;
+  background: linear-gradient(135deg, #3a2b6b, #6b2b4a);
+}
+.web-thumb { background: linear-gradient(135deg, #1f4d4a, #2b5e6b); }
+
+/* Small muted credit next to the Web Games heading */
+#web-credit { font-weight: 400; font-size: 0.82rem; color: var(--muted); }
+
+/* Transient "Saved ✓" / "Loaded ✓" message inside the player */
+.player-toast {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: rgba(20, 22, 28, 0.95);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, transform 0.15s;
+  z-index: 5;
+}
+.player-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 560px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
@@ -271,6 +437,50 @@ main { padding: 22px 20px 60px; max-width: 1500px; margin: 0 auto; }
   font-family: ui-monospace, monospace;
   font-size: 0.82rem;
 }
+
+/* ============ "What's new" popup ============ */
+.update-box {
+  width: min(460px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.update-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.update-body { padding: 16px 18px; line-height: 1.55; }
+.update-body p { margin: 0; }
+.update-body ul { margin: 12px 0 0; padding-left: 20px; }
+.update-body li { margin-bottom: 9px; color: var(--muted); }
+.update-body kbd {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  color: var(--text);
+}
+.update-foot { padding: 0 18px 18px; text-align: right; }
+.update-ok {
+  background: #ffcc33;
+  color: #15161b;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.update-ok:hover { background: #ffd84d; }
 
 /* ============ Math cover (front page) — Dr Frost-style, dark + yellow ============ */
 #math-cover {

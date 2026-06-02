@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>2048</title>
+<style>
+  html,body{margin:0;height:100%;background:#11141a;color:#e8eaf0;font-family:system-ui,sans-serif;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;user-select:none}
+  #hud{font-size:1rem}
+  #b{display:grid;grid-template-columns:repeat(4,76px);grid-gap:8px;background:#1c1f26;padding:8px;border-radius:10px;touch-action:none}
+  .t{width:76px;height:76px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:1.6rem;background:#262a33;color:#e8eaf0}
+  #msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;
+    background:rgba(8,10,14,.78);font-size:1.4rem;gap:10px}
+  button{background:#ffcc33;color:#15161b;border:0;border-radius:8px;padding:10px 22px;font-weight:700;cursor:pointer}
+  small{color:#8a909d}
+</style>
+</head>
+<body>
+<div id="hud">Score: <b id="score">0</b></div>
+<div id="b"></div>
+<small>Arrow keys / WASD · swipe on touch</small>
+<div id="msg"><div id="msgt"></div><button onclick="reset()">New game ▶</button></div>
+<script>
+const COL={2:"#3a3f4b",4:"#46506b",8:"#e0913a",16:"#e0773a",32:"#e0593a",64:"#e03a3a",
+  128:"#e0c63a",256:"#e0cc2a",512:"#cdb52a",1024:"#6fce5f",2048:"#4aa3d6"};
+let g,score,over;
+function reset(){ g=Array.from({length:4},()=>[0,0,0,0]); score=0; over=false; add(); add();
+  document.getElementById("msg").style.display="none"; draw(); }
+function add(){ const e=[]; g.forEach((r,i)=>r.forEach((v,j)=>{if(!v)e.push([i,j]);}));
+  if(!e.length)return; const[i,j]=e[(Math.random()*e.length)|0]; g[i][j]=Math.random()<.9?2:4; }
+function draw(){ const b=document.getElementById("b"); b.innerHTML="";
+  for(let i=0;i<4;i++)for(let j=0;j<4;j++){ const v=g[i][j], d=document.createElement("div");
+    d.className="t"; d.textContent=v||""; if(v){d.style.background=COL[v]||"#4aa3d6"; if(v>=8)d.style.color="#15161b";}
+    b.appendChild(d); }
+  document.getElementById("score").textContent=score; }
+function slide(row){ let a=row.filter(v=>v); for(let i=0;i<a.length-1;i++) if(a[i]==a[i+1]){a[i]*=2;score+=a[i];a.splice(i+1,1);}
+  while(a.length<4)a.push(0); return a; }
+function rotate(m){ return m[0].map((_,c)=>m.map(r=>r[c]).reverse()); }
+function move(dir){ // 0 left 1 up 2 right 3 down
+  let m=g.map(r=>r.slice()); for(let k=0;k<dir;k++)m=rotate(m);
+  let moved=false; m=m.map(r=>{const s=slide(r); if(s.join()!=r.join())moved=true; return s;});
+  for(let k=0;k<(4-dir)%4;k++)m=rotate(m);
+  if(moved){ g=m; add(); draw(); if(!canMove()) end(); }
+}
+function canMove(){ for(let i=0;i<4;i++)for(let j=0;j<4;j++){ if(!g[i][j])return true;
+  if(j<3&&g[i][j]==g[i][j+1])return true; if(i<3&&g[i][j]==g[i+1][j])return true; } return false; }
+function end(){ over=true; document.getElementById("msgt").textContent="Game Over · "+score; document.getElementById("msg").style.display="flex"; }
+addEventListener("keydown",e=>{ if(over)return; const k=e.key.toLowerCase(); let d;
+  if(k=="arrowleft"||k=="a")d=0; else if(k=="arrowup"||k=="w")d=1; else if(k=="arrowright"||k=="d")d=2;
+  else if(k=="arrowdown"||k=="s")d=3; else return; e.preventDefault(); move(d); });
+let ts=null; const bd=document.getElementById("b");
+bd.addEventListener("touchstart",e=>{ts=e.touches[0];},{passive:true});
+bd.addEventListener("touchend",e=>{ if(!ts||over)return; const t=e.changedTouches[0],dx=t.clientX-ts.clientX,dy=t.clientY-ts.clientY;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<24){ts=null;return;}
+  move(Math.abs(dx)>Math.abs(dy)?(dx>0?2:0):(dy>0?3:1)); ts=null;},{passive:true});
+reset();
+</script>
+</body>
+</html>

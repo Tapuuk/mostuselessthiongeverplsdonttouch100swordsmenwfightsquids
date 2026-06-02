@@ -49,29 +49,34 @@
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot"></span>
-      Gamesite
+      Games
     </div>
-
-    <form id="search-form" class="search">
-      <input
-        id="search-input"
-        type="search"
-        placeholder="Search Flash games on the Internet Archive…"
-        autocomplete="off"
-        aria-label="Search Flash games"
-      />
-      <button type="submit" aria-label="Search">Search</button>
-    </form>
 
     <div class="topbar-actions">
       <button id="to-math-btn" class="ghost-btn" title="Back to math (Ctrl+L)">↩ Math</button>
-      <button id="mute-btn" class="ghost-btn" title="Mute / unmute all games (M)">🔊 Sound</button>
+      <button id="mute-btn" class="ghost-btn" title="Mute / unmute all games (Ctrl+M)">🔊 Sound</button>
       <button id="export-btn" class="ghost-btn" title="Download a backup of your favorites, history and game saves">Export saves</button>
       <button id="import-btn" class="ghost-btn" title="Restore from a backup file">Import saves</button>
       <input id="import-file" type="file" accept="application/json" hidden />
       <button id="shortcuts-btn" class="ghost-btn" title="Keyboard shortcuts">⌨ Shortcuts</button>
     </div>
   </header>
+
+  <!-- Library tabs: Home (everything) · Flash Archive · Retro Console · Web Games. -->
+  <nav class="tabs" role="tablist" aria-label="Game library">
+    <button class="tab-btn active" data-tab="home" role="tab">🏠 Home</button>
+    <button class="tab-btn" data-tab="flash" role="tab">⚡ Flash Archive</button>
+    <button class="tab-btn" data-tab="retro" role="tab">🎮 Retro Console</button>
+    <button class="tab-btn" data-tab="web" role="tab">🕹 Web Games</button>
+  </nav>
+
+  <!-- One search bar for the active tab: global on Home, scoped to the tab's
+       catalog otherwise. Sits under the tabs, above favorites / recently-played. -->
+  <form id="search-form" class="tab-search">
+    <input id="search-input" type="search" autocomplete="off"
+      placeholder="Search all games…" aria-label="Search games" />
+    <button type="submit">Search</button>
+  </form>
 
   <main>
     <!-- Favorites row -->
@@ -82,13 +87,37 @@
 
     <!-- Recently played row -->
     <section id="history-section" class="shelf" hidden>
-      <h2>↺ Recently played</h2>
+      <div class="shelf-head">
+        <h2>↺ Recently played</h2>
+        <button id="clear-history-btn" class="ghost-btn" title="Clear your recently-played history">🗑 Clear history</button>
+      </div>
       <div id="history-grid" class="grid"></div>
+    </section>
+
+    <!-- Retro console games (emulated with EmulatorJS) -->
+    <section id="console-section" class="shelf" hidden>
+      <div class="shelf-head">
+        <h2>🎮 Retro Console</h2>
+        <button id="addroms-btn" class="ghost-btn" title="Add your own ROMs by URL">➕ Add ROMs</button>
+      </div>
+      <div id="console-grid" class="grid"></div>
+    </section>
+
+    <!-- Web games: open-source HTML5 games vendored into games/<slug>/ (web-games.json) -->
+    <section id="web-section" class="shelf" hidden>
+      <div class="shelf-head">
+        <h2>🕹 Web Games</h2>
+        <button id="addweb-btn" class="ghost-btn" title="Add any HTML5/WebGL game by URL">➕ Add game</button>
+      </div>
+      <div id="web-grid" class="grid"></div>
+      <div id="web-status" class="status"></div>
     </section>
 
     <!-- Search results -->
     <section id="results-section" class="shelf">
-      <h2 id="results-title">Browse games</h2>
+      <div class="shelf-head">
+        <h2 id="results-title">Browse games</h2>
+      </div>
       <div id="results-grid" class="grid"></div>
       <div id="results-status" class="status"></div>
       <button id="load-more" class="load-more" hidden>Load more</button>
@@ -105,10 +134,96 @@
       <dl class="shortcuts-list">
         <dt><kbd>Ctrl</kbd> + <kbd>L</kbd></dt><dd>Return to the math page (from anywhere)</dd>
         <dt><kbd>Ctrl</kbd> + <kbd>F</kbd></dt><dd>Fullscreen the current game</dd>
-        <dt><kbd>M</kbd></dt><dd>Mute / unmute all game sound</dd>
+        <dt><kbd>Ctrl</kbd> + <kbd>Y</kbd></dt><dd>Quick save (retro &amp; Flash games)</dd>
+        <dt><kbd>Ctrl</kbd> + <kbd>U</kbd></dt><dd>Quick load (retro &amp; Flash games)</dd>
+        <dt><kbd>Ctrl</kbd> + <kbd>M</kbd></dt><dd>Mute / unmute all game sound</dd>
         <dt><kbd>Esc</kbd></dt><dd>Close the game / exit fullscreen</dd>
-        <dt>Click bottom-right corner</dt><dd>Enter the games from the math page</dd>
+        <dt>Type <kbd>61</kbd> in question 4</dt><dd>Enter the games from the math page</dd>
       </dl>
+    </div>
+  </div>
+
+  <!-- Add-ROMs importer: paste ROM URLs to add them to the Retro library -->
+  <div id="addroms-overlay" class="overlay" hidden>
+    <div class="addroms-box">
+      <div class="addroms-head">
+        <span>➕ Add ROMs to your library</span>
+        <button id="addroms-close" class="ghost-btn" title="Close (Esc)">✕</button>
+      </div>
+      <div class="addroms-body">
+        <p class="addroms-hint">
+          One ROM per line. The console is auto-detected from the file extension
+          (<code>.md/.gen/.bin</code> → Genesis,
+          <code>.gg</code> → Game Gear, <code>.nes</code>, <code>.sfc</code>,
+          <code>.gba</code>, <code>.gb/.gbc</code>, <code>.a26</code>, <code>.pce</code>,
+          <code>.n64/.z64</code>…). The ROM URL must allow cross-origin requests
+          (e.g. <code>raw.githubusercontent.com</code> or
+          <code>archive.org/cors/&lt;id&gt;/&lt;file&gt;</code>).
+        </p>
+        <p class="addroms-hint">
+          Optional formats per line:
+          <code>Title|https://…/game.md</code> or
+          <code>segaMD|Title|https://…/game.bin</code>
+        </p>
+        <textarea id="addroms-input" rows="10" spellcheck="false"
+          placeholder="https://example.com/roms/sonic-homebrew.md&#10;My Game|https://example.com/roms/file.bin&#10;segaMD|Cool Demo|https://example.com/roms/demo.gen"></textarea>
+        <div id="addroms-count" class="addroms-count"></div>
+      </div>
+      <div class="addroms-foot">
+        <button id="addroms-clear" class="ghost-btn" title="Remove all ROMs you added">Clear added</button>
+        <button id="addroms-add" class="update-ok">Add to library</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add-web-game importer: paste any HTML5/WebGL game URL -->
+  <div id="addweb-overlay" class="overlay" hidden>
+    <div class="addroms-box">
+      <div class="addroms-head">
+        <span>➕ Add a web game</span>
+        <button id="addweb-close" class="ghost-btn" title="Close (Esc)">✕</button>
+      </div>
+      <div class="addroms-body">
+        <p class="addroms-hint">
+          One game per line. Paste the <strong>direct play URL</strong> of an
+          HTML5/WebGL game. <strong>Important on a locked-down device:</strong> it
+          must be reachable AND allow iframe embedding. itch.io URLs do <em>not</em>
+          work (itch blocks hotlinking + is DNS-blocked). The safe choice is a game
+          living in this site's own <code>games/</code> folder
+          (e.g. <code>games/myslug/index.html</code>), or another host that isn't
+          blocked and doesn't set <code>X-Frame-Options</code>.
+        </p>
+        <p class="addroms-hint">Optional: <code>Title|games/myslug/index.html</code></p>
+        <textarea id="addweb-input" rows="9" spellcheck="false"
+          placeholder="games/myslug/index.html&#10;My Game|https://some-unblocked-host.example/game/"></textarea>
+        <div id="addweb-count" class="addroms-count"></div>
+      </div>
+      <div class="addroms-foot">
+        <button id="addweb-clear" class="ghost-btn" title="Remove all games you added">Clear added</button>
+        <button id="addweb-add" class="update-ok">Add to library</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- "What's new" popup — shows once per device (see UPDATE_ID in app.js) -->
+  <div id="update-overlay" class="overlay" hidden>
+    <div class="update-box">
+      <div class="update-head">
+        <span>✨ What's new</span>
+        <button id="update-close" class="ghost-btn" title="Close">✕</button>
+      </div>
+      <div class="update-body">
+        <p><strong>🚀 Big update — lots of new ways to play!</strong></p>
+        <ul>
+          <li><strong>Tabs</strong> up top: <strong>Home</strong>, <strong>Flash Archive</strong>, <strong>Retro Console</strong> and <strong>Web Games</strong> — each with its own search.</li>
+          <li><strong>🎮 Retro Console:</strong> play NES, SNES, Sega Genesis, GBA, Game Boy &amp; Game Gear games right on the page, with save / load.</li>
+          <li><strong>🕹 Web Games:</strong> built-in HTML5 games that load instantly — no sign-in, nothing to block.</li>
+        </ul>
+        <p>⚠️ <strong>Still a work in progress</strong> — expect rough edges, and <strong>lots more games coming soon.</strong></p>
+      </div>
+      <div class="update-foot">
+        <button id="update-ok" class="update-ok">Got it</button>
+      </div>
     </div>
   </div>
 
@@ -118,6 +233,8 @@
       <div class="player-head">
         <span id="player-title">Loading…</span>
         <div class="player-head-actions">
+          <button id="player-save" class="ghost-btn" title="Save progress (overwrites your last save)" hidden>⤓ Save</button>
+          <button id="player-load" class="ghost-btn" title="Load your last save" hidden>⤒ Load</button>
           <button id="player-fullscreen" class="ghost-btn" title="Fullscreen (Ctrl+F)">⛶ Fullscreen</button>
           <button id="player-fav" class="ghost-btn" title="Add to favorites">♡ Favorite</button>
           <button id="player-close" class="ghost-btn" title="Close (Esc)">✕ Close</button>

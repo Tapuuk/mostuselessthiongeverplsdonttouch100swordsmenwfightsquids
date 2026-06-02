@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Tetris</title>
+<style>
+  html,body{margin:0;height:100%;background:#11141a;color:#e8eaf0;font-family:system-ui,sans-serif;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none}
+  canvas{background:#0c0e13;border:2px solid #2a2f3a;border-radius:8px;touch-action:none;max-height:80vh}
+  #hud{font-size:1rem}
+  #msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;
+    background:rgba(8,10,14,.78);font-size:1.4rem;gap:10px}
+  button{background:#ffcc33;color:#15161b;border:0;border-radius:8px;padding:10px 22px;font-weight:700;cursor:pointer}
+  small{color:#8a909d;text-align:center}
+</style>
+</head>
+<body>
+<div id="hud">Score: <b id="score">0</b> &nbsp;·&nbsp; Lines: <b id="lines">0</b></div>
+<canvas id="c" width="240" height="440"></canvas>
+<small>← → move · ↑ rotate · ↓ soft drop · Space hard drop</small>
+<div id="msg"><div id="msgt"></div><button onclick="reset()">Play again ▶</button></div>
+<script>
+const cv=document.getElementById("c"), x=cv.getContext("2d"), CW=10, CH=20, P=22;
+const SH={I:[[1,1,1,1]],O:[[1,1],[1,1]],T:[[0,1,0],[1,1,1]],S:[[0,1,1],[1,1,0]],
+  Z:[[1,1,0],[0,1,1]],J:[[1,0,0],[1,1,1]],L:[[0,0,1],[1,1,1]]};
+const CO={I:"#4aa3d6",O:"#e0c63a",T:"#8b6fe0",S:"#6fce5f",Z:"#e0544e",J:"#4a6fd6",L:"#e0913a"};
+let grid,cur,score,lines,over,drop,acc;
+function spawn(){ const k=Object.keys(SH), t=k[(Math.random()*k.length)|0];
+  cur={t,m:SH[t].map(r=>r.slice()),x:(CW/2|0)-1,y:0}; if(hit(cur.m,cur.x,cur.y)) end(); }
+function reset(){ grid=Array.from({length:CH},()=>Array(CW).fill("")); score=0; lines=0; over=false; drop=600; acc=0;
+  document.getElementById("msg").style.display="none"; spawn(); upd(); }
+function upd(){ document.getElementById("score").textContent=score; document.getElementById("lines").textContent=lines; }
+function hit(m,ox,oy){ for(let i=0;i<m.length;i++)for(let j=0;j<m[i].length;j++){ if(!m[i][j])continue;
+  const X=ox+j,Y=oy+i; if(X<0||X>=CW||Y>=CH||(Y>=0&&grid[Y][X])) return true; } return false; }
+function merge(){ cur.m.forEach((r,i)=>r.forEach((v,j)=>{ if(v&&cur.y+i>=0) grid[cur.y+i][cur.x+j]=cur.t; })); }
+function clear(){ let n=0; for(let i=CH-1;i>=0;i--){ if(grid[i].every(c=>c)){ grid.splice(i,1); grid.unshift(Array(CW).fill("")); n++; i++; } }
+  if(n){ lines+=n; score+=[0,40,100,300,1200][n]; upd(); } }
+function lock(){ merge(); clear(); spawn(); }
+function rot(){ const m=cur.m, r=m[0].map((_,c)=>m.map(row=>row[c]).reverse());
+  if(!hit(r,cur.x,cur.y)) cur.m=r; else if(!hit(r,cur.x-1,cur.y)){cur.x--;cur.m=r;} else if(!hit(r,cur.x+1,cur.y)){cur.x++;cur.m=r;} }
+function fall(){ if(!hit(cur.m,cur.x,cur.y+1)) cur.y++; else lock(); }
+function end(){ over=true; document.getElementById("msgt").textContent="Game Over · "+score; document.getElementById("msg").style.display="flex"; }
+function cell(X,Y,c){ x.fillStyle=c; x.fillRect(X*P+1,Y*P+1,P-2,P-2); }
+function draw(){ x.fillStyle="#0c0e13"; x.fillRect(0,0,240,440);
+  for(let i=0;i<CH;i++)for(let j=0;j<CW;j++) if(grid[i][j]) cell(j,i,CO[grid[i][j]]);
+  cur.m.forEach((r,i)=>r.forEach((v,j)=>{ if(v) cell(cur.x+j,cur.y+i,CO[cur.t]); })); }
+let last=0;
+function loop(t){ const dt=t-last; last=t; if(!over){ acc+=dt; if(acc>drop){ acc=0; fall(); } draw(); } requestAnimationFrame(loop); }
+addEventListener("keydown",e=>{ if(over)return; const k=e.key;
+  if(k=="ArrowLeft"){ if(!hit(cur.m,cur.x-1,cur.y))cur.x--; }
+  else if(k=="ArrowRight"){ if(!hit(cur.m,cur.x+1,cur.y))cur.x++; }
+  else if(k=="ArrowUp"){ rot(); }
+  else if(k=="ArrowDown"){ fall(); }
+  else if(k==" "){ while(!hit(cur.m,cur.x,cur.y+1))cur.y++; lock(); }
+  else return; e.preventDefault(); draw(); });
+reset(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

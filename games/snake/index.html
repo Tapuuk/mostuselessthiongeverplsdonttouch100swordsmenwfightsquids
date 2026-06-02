@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Snake</title>
+<style>
+  html,body{margin:0;height:100%;background:#11141a;color:#e8eaf0;font-family:system-ui,sans-serif;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;user-select:none}
+  canvas{background:#0c0e13;border:2px solid #2a2f3a;border-radius:8px;touch-action:none;max-width:96vw;max-height:78vh}
+  #hud{font-size:1rem;letter-spacing:.5px}
+  #msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;
+    background:rgba(8,10,14,.78);font-size:1.3rem;gap:10px;text-align:center}
+  button{background:#ffcc33;color:#15161b;border:0;border-radius:8px;padding:10px 22px;font-weight:700;cursor:pointer}
+  small{color:#8a909d}
+</style>
+</head>
+<body>
+<div id="hud">Score: <b id="score">0</b> &nbsp;·&nbsp; Best: <b id="best">0</b></div>
+<canvas id="c" width="400" height="400"></canvas>
+<small>Arrow keys / WASD · swipe on touch</small>
+<div id="msg"><div id="msgt">Game Over</div><button onclick="reset()">Play again ▶</button></div>
+<script>
+const N=20, S=20, cv=document.getElementById("c"), x=cv.getContext("2d");
+let snake, dir, nd, food, score, best=+(localStorage.getItem("snake.best")||0), alive, tick;
+document.getElementById("best").textContent=best;
+function reset(){
+  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}]; dir={x:1,y:0}; nd=dir; place(); score=0; alive=true;
+  document.getElementById("score").textContent=0; document.getElementById("msg").style.display="none";
+}
+function place(){ do{ food={x:(Math.random()*N)|0,y:(Math.random()*N)|0}; }while(snake.some(s=>s.x==food.x&&s.y==food.y)); }
+function step(){
+  if(!alive) return;
+  dir=nd; const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+  if(h.x<0||h.y<0||h.x>=N||h.y>=N||snake.some(s=>s.x==h.x&&s.y==h.y)){ return over(); }
+  snake.unshift(h);
+  if(h.x==food.x&&h.y==food.y){ score++; document.getElementById("score").textContent=score; place(); }
+  else snake.pop();
+  draw();
+}
+function over(){
+  alive=false; if(score>best){ best=score; localStorage.setItem("snake.best",best); document.getElementById("best").textContent=best; }
+  document.getElementById("msgt").textContent="Game Over · "+score; document.getElementById("msg").style.display="flex";
+}
+function draw(){
+  x.fillStyle="#0c0e13"; x.fillRect(0,0,400,400);
+  x.fillStyle="#e0544e"; x.fillRect(food.x*S+2,food.y*S+2,S-4,S-4);
+  snake.forEach((s,i)=>{ x.fillStyle=i?"#5fce8a":"#9bf0bd"; x.fillRect(s.x*S+1,s.y*S+1,S-2,S-2); });
+}
+addEventListener("keydown",e=>{
+  const k=e.key.toLowerCase(); let v;
+  if(k=="arrowup"||k=="w")v={x:0,y:-1}; else if(k=="arrowdown"||k=="s")v={x:0,y:1};
+  else if(k=="arrowleft"||k=="a")v={x:-1,y:0}; else if(k=="arrowright"||k=="d")v={x:1,y:0}; else return;
+  e.preventDefault(); if(v.x!=-dir.x||v.y!=-dir.y) nd=v;
+});
+let ts=null;
+cv.addEventListener("touchstart",e=>{ts=e.touches[0];},{passive:true});
+cv.addEventListener("touchend",e=>{ if(!ts)return; const t=e.changedTouches[0], dx=t.clientX-ts.clientX, dy=t.clientY-ts.clientY;
+  if(Math.abs(dx)>Math.abs(dy)) nd=(dx>0&&dir.x!=-1)?{x:1,y:0}:(dx<0&&dir.x!=1)?{x:-1,y:0}:nd;
+  else nd=(dy>0&&dir.y!=-1)?{x:0,y:1}:(dy<0&&dir.y!=1)?{x:0,y:-1}:nd; ts=null;},{passive:true});
+reset(); draw(); tick=setInterval(step,95);
+</script>
+</body>
+</html>

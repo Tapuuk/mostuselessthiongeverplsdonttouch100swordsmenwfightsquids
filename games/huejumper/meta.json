@@ -1,0 +1,10 @@
+{
+ "title": "Hue Jumper",
+ "license": "GPL-3.0",
+ "credit": "Frank Force (KilledByAPixel)",
+ "source": "https://github.com/KilledByAPixel/HueJumper2k",
+ "colors": [
+  "#102a4d",
+  "#1f566b"
+ ]
+}
