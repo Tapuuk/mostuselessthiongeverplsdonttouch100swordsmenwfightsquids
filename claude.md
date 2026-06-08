@@ -17,13 +17,20 @@ One search bar sits under the tabs (global on Home, scoped to the tab otherwise)
 - **Flash Archive** — `.swf` games from the Internet Archive `softwarelibrary_flash`
   collection, played with **Ruffle** (WASM, lazy-loaded from unpkg). Browsed via the
   Archive search API with `sort[]=random`; fetched through `/cors/` URLs.
-- **Web Games** — self-hosted HTML5 games served from this origin (Chromebook-proof):
-  a few built-from-scratch canvas games + license-verified open-source titles
-  (GPL/MIT, credited).
+- **Web Games** — one tab, multiple sources merged into a single list so the search
+  bar covers them all at once. Each game's `credit` (source name) shows under its
+  title.
+  - **Self-hosted** (Chromebook-proof): built-from-scratch canvas games +
+    license-verified open-source titles (GPL/MIT), served same-origin from `games/`.
+  - **External embedded catalogs** (`EXTRA_WEB_CATALOGS` in `app.js`): **madkid.games**
+    (~449, plays from `madkidgames.com/full/<slug>`). Iframe-embedded, so it only
+    loads if that external domain isn't blocked on the device (NOT Chromebook-proof —
+    must be tested on-device). `renderWeb` draws cards in `WEB_BATCH` chunks and
+    auto-loads more on scroll (IntersectionObserver on `#web-sentinel`).
 
-*(GameDistribution embedding was tried and dropped: unlocking its catalog requires
-full Google Ad Manager / ads onboarding + domain whitelist, which we don't want.
-Every "free embed" portal gates the same way. Stick to self-hosted open-source.)*
+*(idev.games was dropped — `X-Frame-Options: SAMEORIGIN`, refuses embedding.
+GameDistribution too — its catalog needs full Google Ad Manager/ads onboarding +
+domain whitelist. Portals that gate on ads/whitelist or block framing are out.)*
 
 *(A Retro Console tab — EmulatorJS + ROMs — was removed: hosting commercial ROMs
 publicly = copyright distribution + blows the GitHub Pages size cap.)*
@@ -40,9 +47,10 @@ publicly = copyright distribution + blows the GitHub Pages size cap.)*
 - `build.py` — runs the build.
 - `fetch-html5-games.py` — vendors **license-verified** open-source HTML5 games from
   GitHub into `games/<slug>/` (manifest-gated; refuses anything not redistributable).
+- `fetch-madkid-games.py` — reads madkid.games' sitemap → `madkid-games.json`.
 
-Run a builder after changing the folder, then commit. Site loads
-`web-games.json` at runtime (`loadWebGames` in `app.js`).
+Run a builder after changing the folder, then commit. Site loads `web-games.json`
+(`loadWebGames`) + the `EXTRA_WEB_CATALOGS` (`loadExtraCatalogs`) at runtime.
 
 ## Saves & state (browser-only)
 - localStorage: favorites, history, Flash SharedObject backups.
