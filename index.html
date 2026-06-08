@@ -63,11 +63,10 @@
     </div>
   </header>
 
-  <!-- Library tabs: Home (everything) · Flash Archive · Retro Console · Web Games. -->
+  <!-- Library tabs: Home (everything) · Flash Archive · Web Games. -->
   <nav class="tabs" role="tablist" aria-label="Game library">
     <button class="tab-btn active" data-tab="home" role="tab">🏠 Home</button>
     <button class="tab-btn" data-tab="flash" role="tab">⚡ Flash Archive</button>
-    <button class="tab-btn" data-tab="retro" role="tab">🎮 Retro Console</button>
     <button class="tab-btn" data-tab="web" role="tab">🕹 Web Games</button>
   </nav>
 
@@ -97,16 +96,6 @@
         <button id="clear-history-btn" class="ghost-btn" title="Clear your recently-played history">🗑 Clear history</button>
       </div>
       <div id="history-grid" class="grid"></div>
-    </section>
-
-    <!-- Retro console games (emulated with EmulatorJS) -->
-    <section id="console-section" class="shelf" hidden>
-      <div class="shelf-head">
-        <h2>🎮 Retro Console</h2>
-        <button id="addroms-btn" class="ghost-btn" title="Add your own ROMs by URL">➕ Add ROMs</button>
-      </div>
-      <div id="console-grid" class="grid"></div>
-      <div id="console-status" class="status"></div>
     </section>
 
     <!-- Web games: open-source HTML5 games vendored into games/<slug>/ (web-games.json) -->
@@ -140,45 +129,12 @@
       <dl class="shortcuts-list">
         <dt><kbd>Ctrl</kbd> + <kbd>L</kbd></dt><dd>Return to the math page (from anywhere)</dd>
         <dt><kbd>Ctrl</kbd> + <kbd>F</kbd></dt><dd>Fullscreen the current game</dd>
-        <dt><kbd>Ctrl</kbd> + <kbd>Y</kbd></dt><dd>Quick save (retro &amp; Flash games)</dd>
-        <dt><kbd>Ctrl</kbd> + <kbd>U</kbd></dt><dd>Quick load (retro &amp; Flash games)</dd>
+        <dt><kbd>Ctrl</kbd> + <kbd>Y</kbd></dt><dd>Back up save (Flash games)</dd>
+        <dt><kbd>Ctrl</kbd> + <kbd>U</kbd></dt><dd>Restore save (Flash games)</dd>
         <dt><kbd>Ctrl</kbd> + <kbd>M</kbd></dt><dd>Mute / unmute all game sound</dd>
         <dt><kbd>Esc</kbd></dt><dd>Close the game / exit fullscreen</dd>
         <dt>Type <kbd>61</kbd> or <kbd>33</kbd> in question 4</dt><dd>Enter the games from the math page</dd>
       </dl>
-    </div>
-  </div>
-
-  <!-- Add-ROMs importer: paste ROM URLs to add them to the Retro library -->
-  <div id="addroms-overlay" class="overlay" hidden>
-    <div class="addroms-box">
-      <div class="addroms-head">
-        <span>➕ Add ROMs to your library</span>
-        <button id="addroms-close" class="ghost-btn" title="Close (Esc)">✕</button>
-      </div>
-      <div class="addroms-body">
-        <p class="addroms-hint">
-          One ROM per line. The console is auto-detected from the file extension
-          (<code>.md/.gen/.bin</code> → Genesis,
-          <code>.gg</code> → Game Gear, <code>.nes</code>, <code>.sfc</code>,
-          <code>.gba</code>, <code>.gb/.gbc</code>, <code>.a26</code>, <code>.pce</code>,
-          <code>.n64/.z64</code>…). The ROM URL must allow cross-origin requests
-          (e.g. <code>raw.githubusercontent.com</code> or
-          <code>archive.org/cors/&lt;id&gt;/&lt;file&gt;</code>).
-        </p>
-        <p class="addroms-hint">
-          Optional formats per line:
-          <code>Title|https://…/game.md</code> or
-          <code>segaMD|Title|https://…/game.bin</code>
-        </p>
-        <textarea id="addroms-input" rows="10" spellcheck="false"
-          placeholder="https://example.com/roms/sonic-homebrew.md&#10;My Game|https://example.com/roms/file.bin&#10;segaMD|Cool Demo|https://example.com/roms/demo.gen"></textarea>
-        <div id="addroms-count" class="addroms-count"></div>
-      </div>
-      <div class="addroms-foot">
-        <button id="addroms-clear" class="ghost-btn" title="Remove all ROMs you added">Clear added</button>
-        <button id="addroms-add" class="update-ok">Add to library</button>
-      </div>
     </div>
   </div>
 
@@ -221,8 +177,7 @@
       <div class="update-body">
         <p><strong>🚀 Big update — lots of new ways to play!</strong></p>
         <ul>
-          <li><strong>Tabs</strong> up top: <strong>Home</strong>, <strong>Flash Archive</strong>, <strong>Retro Console</strong> and <strong>Web Games</strong> — each with its own search.</li>
-          <li><strong>🎮 Retro Console:</strong> play NES, SNES, Sega Genesis, GBA, Game Boy &amp; Game Gear games right on the page, with save / load.</li>
+          <li><strong>Tabs</strong> up top: <strong>Home</strong>, <strong>Flash Archive</strong> and <strong>Web Games</strong> — each with its own search.</li>
           <li><strong>🕹 Web Games:</strong> built-in HTML5 games that load instantly — no sign-in, nothing to block.</li>
         </ul>
         <p>⚠️ <strong>Still a work in progress</strong> — expect rough edges, and <strong>lots more games coming soon.</strong></p>
