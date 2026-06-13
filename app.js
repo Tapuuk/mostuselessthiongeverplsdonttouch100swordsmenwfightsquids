@@ -22,7 +22,7 @@ const WEB_GAMES_URL = "web-games.json";  // self-hosted HTML5 games catalog (bui
 // {identifier,title,url,img,credit} built by a tools/fetch-*-games.py crawler.
 // They load from external domains, so they only play if those domains aren't
 // blocked on the device (unlike the self-hosted games/ catalog).
-const EXTRA_WEB_CATALOGS = ["madkid-games.json"];
+const EXTRA_WEB_CATALOGS = ["madkid-games.json", "gamepix-games.json"];
 const WEB_BATCH = 80;                     // web-game cards drawn per batch (rest auto-load on scroll)
 const LS_UPDATE_SEEN = "gamesite.update.seen";
 const UPDATE_ID = "2026-06-tabs-web"; // bump this to show a fresh "What's new" once per device

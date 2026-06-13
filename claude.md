@@ -22,11 +22,13 @@ One search bar sits under the tabs (global on Home, scoped to the tab otherwise)
   title.
   - **Self-hosted** (Chromebook-proof): built-from-scratch canvas games +
     license-verified open-source titles (GPL/MIT), served same-origin from `games/`.
-  - **External embedded catalogs** (`EXTRA_WEB_CATALOGS` in `app.js`): **madkid.games**
-    (~449, plays from `madkidgames.com/full/<slug>`). Iframe-embedded, so it only
-    loads if that external domain isn't blocked on the device (NOT Chromebook-proof —
-    must be tested on-device). `renderWeb` draws cards in `WEB_BATCH` chunks and
-    auto-loads more on scroll (IntersectionObserver on `#web-sentinel`).
+  - **External embedded catalogs** (`EXTRA_WEB_CATALOGS` in `app.js`):
+    **madkid.games** (~449, plays from `madkidgames.com/full/<slug>`) and
+    **GamePix** (~13k, plays from `play.gamepix.com/<slug>/embed`). Iframe-embedded,
+    so they only load if those external domains aren't blocked on the device (NOT
+    Chromebook-proof — must be tested on-device). `renderWeb` draws cards in
+    `WEB_BATCH` chunks and auto-loads more on scroll (IntersectionObserver on
+    `#web-sentinel`).
 
 *(idev.games was dropped — `X-Frame-Options: SAMEORIGIN`, refuses embedding.
 GameDistribution too — its catalog needs full Google Ad Manager/ads onboarding +
@@ -48,6 +50,9 @@ publicly = copyright distribution + blows the GitHub Pages size cap.)*
 - `fetch-html5-games.py` — vendors **license-verified** open-source HTML5 games from
   GitHub into `games/<slug>/` (manifest-gated; refuses anything not redistributable).
 - `fetch-madkid-games.py` — reads madkid.games' sitemap → `madkid-games.json`.
+- `fetch-gamepix-games.py` — pages GamePix's public JSON feed → `gamepix-games.json`
+  (~13k games; embed URLs on `play.gamepix.com/<slug>/embed`, which sets no
+  `X-Frame-Options`, so it frames where the main `gamepix.com` site would not).
 
 Run a builder after changing the folder, then commit. Site loads `web-games.json`
 (`loadWebGames`) + the `EXTRA_WEB_CATALOGS` (`loadExtraCatalogs`) at runtime.
